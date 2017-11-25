@@ -1,24 +1,38 @@
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle;
+import javax.swing.table.DefaultTableModel;
+
+import javafx.scene.layout.Border;
 
 import java.awt.Dimension;
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Container;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+
+import java.util.ArrayList;
 
 public class SolverPanel extends JPanel {
     protected final int MINIMIZE = 0;
     protected final int MAXIMIZE = 1;
+    protected final Color GRE = new Color(210, 215, 216);
     
     protected Container container;
     private JTextField objFxnField;
@@ -26,6 +40,7 @@ public class SolverPanel extends JPanel {
     private int selection;
     private String objFxn;
     private String constraints;
+    private JPanel tables;
 
 	public SolverPanel(Container container){
 		super();
@@ -40,7 +55,6 @@ public class SolverPanel extends JPanel {
 
     private void initComponents() {
         Color blu = new Color(144, 223, 244);
-        Color gre = new Color(210, 215, 216);
 
         JPanel radioPanel = new JPanel();
         JRadioButton min = new JRadioButton("Minimize");
@@ -70,7 +84,7 @@ public class SolverPanel extends JPanel {
         JPanel objFxnLabelPanel = new JPanel();
         JLabel objFxnLabel = new JLabel("Objective Function");
         JPanel objFxnFieldPanel = new JPanel();
-        this.objFxnField = new JTextField();
+        this.objFxnField = new JTextField("Z=150*x+175*y");
         objFxnFieldPanel.setOpaque(false);
         objFxnLabelPanel.setBackground(blu);
         objFxnPanel.setBackground(Color.WHITE);
@@ -87,11 +101,13 @@ public class SolverPanel extends JPanel {
         JPanel conPanel = new JPanel();
         JPanel conLabelPanel = new JPanel();
         JLabel conLabel = new JLabel("Constraints");
-        this.conArea = new JTextArea();
+        this.conArea = new JTextArea("7*x+11*y<=77\n10*x+8*y<=80\n1*x<=9\n1*y<=6");
 
         JPanel tabPanel = new JPanel();
         JPanel tabLabelPanel = new JPanel();
         JLabel tabLabel = new JLabel("Tableau");
+        this.tables = new JPanel(new CardLayout());
+        this.tables.add(new JPanel(), "Empty");
         
         JPanel solvePanel = new JPanel(new BorderLayout());
         JPanel solvePanel2 = new JPanel();
@@ -194,34 +210,35 @@ public class SolverPanel extends JPanel {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        Dimension dim = new Dimension(325, 190);
+        Dimension dim = new Dimension(500, 190);
 
         tabPanel.setPreferredSize(dim);
         tabPanel.setLayout(new BorderLayout());
         tabPanel.add(tabLabelPanel, BorderLayout.NORTH);
         tabLabelPanel.add(tabLabel);
+        tabPanel.add(this.tables, BorderLayout.CENTER);
 
-        conPanel.setPreferredSize(dim);
+        plotPanel.setPreferredSize(dim);
         conPanel.setLayout(new BorderLayout());
         conPanel.add(conLabelPanel, BorderLayout.NORTH);
         conPanel.add(conArea, BorderLayout.CENTER);
         conLabelPanel.add(conLabel);
 
-        solvePanel.setPreferredSize(new Dimension(325, 65));
+        solvePanel.setPreferredSize(new Dimension(325, 50));
 
-        leftPanel.setPreferredSize(new Dimension(325, 445));
+        leftPanel.setPreferredSize(new Dimension(500, 445));
         GroupLayout leftPanelLayout = new GroupLayout(leftPanel);
         leftPanel.setLayout(leftPanelLayout);
         leftPanelLayout.setHorizontalGroup(
             leftPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(plotPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(tabPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(solvePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         leftPanelLayout.setVerticalGroup(
             leftPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, leftPanelLayout.createSequentialGroup()
-                .addComponent(conPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(plotPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -246,7 +263,7 @@ public class SolverPanel extends JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(leftPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(plotPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -258,7 +275,7 @@ public class SolverPanel extends JPanel {
                 .addComponent(objFxnPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(plotPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(leftPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -276,5 +293,52 @@ public class SolverPanel extends JPanel {
         this.objFxn = this.objFxnField.getText();
         this.constraints = this.conArea.getText();
         UltimateSolver us = new UltimateSolver(this.selection, this.objFxn, this.constraints);
+        ArrayList<Tableau> tabs = us.getTabList();
+        
+        // this.tabPanel.setLayout(new GridLayout((tabs.size() - 1), 1));
+        JPanel tableauPanel = new JPanel(new GridLayout(tabs.size(), 1));
+        // BoxLayout box = new BoxLayout(tableauPanel, BoxLayout.Y_AXIS);
+        JScrollPane tabPane = new JScrollPane();
+        tabPane.setViewportView(tableauPanel);
+        this.tables.add(tabPane, "Tableau");
+        
+        for(int i = 0; i < tabs.size(); i++) {
+            Tableau curr = tabs.get(i);
+            String[][] t = curr.getTable();
+            DefaultTableModel model = new DefaultTableModel(curr.getRow(), curr.getCol());
+            // DefaultTableModel model = new DefaultTableModel(curr.getTable(), null);
+            for(int j = 0; j < curr.getRow(); j++) {
+                for(int k = 0; k < curr.getCol(); k++) {
+                    model.setValueAt(t[j][k], j, k);
+                }
+            }
+
+            JTable table = new JTable(model);
+            JPanel newPanel = new JPanel(new BorderLayout());
+            JPanel top = new JPanel();
+            JLabel topLabel = new JLabel();
+            JPanel basicSol = new JPanel();
+            JLabel basic = new JLabel(curr.getBasicSolution());
+
+            if(i == (tabs.size() - 1))
+                topLabel.setText("Final Answer");
+            else
+                topLabel.setText("Iteration " + i);
+
+            basicSol.setBackground(Color.WHITE);
+            basicSol.add(basic);
+
+            top.setBackground(GRE);
+            top.add(topLabel);
+
+            newPanel.add(top, BorderLayout.NORTH);
+            newPanel.add(table, BorderLayout.CENTER);
+            newPanel.add(basicSol, BorderLayout.SOUTH);
+            newPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            tableauPanel.add(newPanel);
+        }
+        
+        CardLayout cardLayout = (CardLayout) this.tables.getLayout();
+        cardLayout.show(this.tables,"Tableau");
     }
 }
