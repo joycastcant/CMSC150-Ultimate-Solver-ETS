@@ -28,6 +28,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ETSPanel extends JPanel {
     protected final int MINIMIZE = 0;
@@ -41,6 +42,11 @@ public class ETSPanel extends JPanel {
     private int src;
     private int dest;
     private int selection;
+    private HashMap<String, Float> capacity;
+    private HashMap<String, Float> demand;
+    private JTable capTable;
+    private JTable demTable;
+    private JTable coTable;
 
 	public ETSPanel(Container container){
 		super(new BorderLayout());
@@ -48,6 +54,8 @@ public class ETSPanel extends JPanel {
         this.selection = MAXIMIZE;
         this.objFxn = "";
         this.constraints = "";
+        this.capacity = new HashMap<String, Float>();
+        this.demand = new HashMap<String, Float>();
 		this.setBackground(new Color(234, 240, 242));
         this.requestFocusInWindow();
     }
@@ -79,7 +87,7 @@ public class ETSPanel extends JPanel {
         JPanel capPanel = new JPanel(new BorderLayout());
         JLabel capLabel = new JLabel("Capacity per source");
         DefaultTableModel capModel = new DefaultTableModel(2, (this.src + 1));
-        JTable capTable = new JTable(capModel);
+        this.capTable = new JTable(capModel);
         
         for(int i = 0; i <= this.src; i++) {
             if(i == 0) {
@@ -98,7 +106,7 @@ public class ETSPanel extends JPanel {
         JPanel demPanel = new JPanel(new BorderLayout());
         JLabel demLabel = new JLabel("Demand per destination");
         DefaultTableModel demModel = new DefaultTableModel(2, (this.dest + 1));
-        JTable demTable = new JTable(demModel);
+        this.demTable = new JTable(demModel);
         
         for(int i = 0; i <= this.dest; i++) {
             if(i == 0) {
@@ -117,7 +125,7 @@ public class ETSPanel extends JPanel {
         JPanel coPanel = new JPanel(new BorderLayout());
         JLabel coLabel = new JLabel("Cost of transaction");
         DefaultTableModel coModel = new DefaultTableModel((this.src + 1), (this.dest + 1));
-        JTable coTable = new JTable(coModel);
+        this.coTable = new JTable(coModel);
         
         for(int i = 0; i <= this.src; i++) {
             for(int j = 0; j <= this.dest; j++) {
@@ -162,6 +170,12 @@ public class ETSPanel extends JPanel {
         
         next.add(nextButtonP, BorderLayout.SOUTH);
 
+        nextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                nextButtonAction(e);
+            }
+        });
+
         unitPanel.add(units);
         unitPanel.add(next);
         tabPanel.add(unitPanel);
@@ -169,6 +183,22 @@ public class ETSPanel extends JPanel {
         JScrollPane pane = new JScrollPane();
         pane.setViewportView(tabPanel);
         this.add(pane, BorderLayout.CENTER);
+    }
+
+    public void nextButtonAction(ActionEvent e) {
+        this.populate(this.capacity, this.src, this.capTable);
+        this.populate(this.demand, this.dest, this.demTable);
+        // this.objFxn = this.objFxnField.getText();
+        // this.constraints = this.conArea.getText();
+        // UltimateSolver us = new UltimateSolver(this.selection, this.objFxn, this.constraints);
+        // ArrayList<Tableau> tabs = us.getTabList();
+    }
+
+    public void populate(HashMap<String, Float> hashh, int size, JTable tab) {
+        for(int i = 0; i < size; i++) {
+            float fl = new Float((String) tab.getValueAt(1, (i + 1)));
+            hashh.put(String.valueOf(i + 1), fl);
+        }
     }
     
 }

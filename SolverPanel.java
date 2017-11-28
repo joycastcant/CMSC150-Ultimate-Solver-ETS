@@ -30,8 +30,8 @@ import java.awt.Toolkit;
 import java.util.ArrayList;
 
 public class SolverPanel extends JPanel {
-    protected final int MINIMIZE = 0;
-    protected final int MAXIMIZE = 1;
+    protected final static int MINIMIZE = 0;
+    protected final static int MAXIMIZE = 1;
     protected final Color GRE = new Color(210, 215, 216);
     
     protected Container container;
@@ -84,7 +84,7 @@ public class SolverPanel extends JPanel {
         JPanel objFxnLabelPanel = new JPanel();
         JLabel objFxnLabel = new JLabel("Objective Function");
         JPanel objFxnFieldPanel = new JPanel();
-        this.objFxnField = new JTextField("Z=150*x+175*y");
+        this.objFxnField = new JTextField();
         objFxnFieldPanel.setOpaque(false);
         objFxnLabelPanel.setBackground(blu);
         objFxnPanel.setBackground(Color.WHITE);
@@ -101,7 +101,7 @@ public class SolverPanel extends JPanel {
         JPanel conPanel = new JPanel();
         JPanel conLabelPanel = new JPanel();
         JLabel conLabel = new JLabel("Constraints");
-        this.conArea = new JTextArea("7*x+11*y<=77\n10*x+8*y<=80\n1*x<=9\n1*y<=6");
+        this.conArea = new JTextArea();
 
         JPanel tabPanel = new JPanel();
         JPanel tabLabelPanel = new JPanel();
@@ -314,6 +314,7 @@ public class SolverPanel extends JPanel {
             }
 
             JTable table = new JTable(model);
+            table.setEnabled(false);
             JPanel newPanel = new JPanel(new BorderLayout());
             JPanel top = new JPanel();
             JLabel topLabel = new JLabel();

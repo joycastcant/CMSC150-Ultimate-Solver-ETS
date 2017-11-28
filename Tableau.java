@@ -97,6 +97,8 @@ public class Tableau {
 
         int soln = this.ncol - 2;
         int tr = this.ncol - 1;
+        float min = 0.0f;
+        int x = 1;
 
         for(int i = 1; i < this.nrow; i++) {
             float a = new Float(t[i][soln]);
@@ -104,16 +106,11 @@ public class Tableau {
 
             if(i == this.nrow - 1)
                 t[i][tr] = " ";
-            else if(b != 0) {
+            else if(b > 0 && a > 0) {
                 t[i][tr] = Float.toString(a/b);
-                if(t[i][tr].equals("-0.0"))
-                    t[i][tr] = "0";
             }
             else t[i][tr] = "X";
         }
-
-        float min = 0.0f;
-        int x = 0;
 
         for(int j = 1; j < this.nrow; j++) {
             if(!t[j][tr].equals(" ") && !t[j][tr].equals("X") && new Float(t[j][tr]) > 0 && (min == 0 || new Float(t[j][tr]) < min)) {
