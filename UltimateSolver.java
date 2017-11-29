@@ -131,7 +131,7 @@ public class UltimateSolver {
             int rrow = tab.length;
             int ccol = tab[0].length;
 
-            for(int c = 1; c < (ccol - 1); c++) {
+            for(int c = 1; c < ccol; c++) {
                 tab[0][c] = "x" + c;
             }
 
@@ -169,9 +169,11 @@ public class UltimateSolver {
                 System.out.println(" \n");
             }
 
+            int cons = this.constraints.size();
+            System.out.println("cons: "+cons);
             for(int i = 1; i < rrow; i++) {
-                for(int j = (i + vars); j < (ccol + vars); j++) {
-                    tablee[0][j] = "S" + (j - vars);
+                for(int j = (i + cons); j <= (ccol + cons); j++) {
+                    tablee[0][j] = "S" + (j - cons);
                     tablee[i][j] = "1";
                     break;
                 }

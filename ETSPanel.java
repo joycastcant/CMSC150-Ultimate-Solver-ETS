@@ -142,26 +142,6 @@ public class ETSPanel extends JPanel {
         coPanel.add(coLabel, BorderLayout.NORTH);
         coPanel.add(coTable, BorderLayout.CENTER);
         tabPanel.add(coPanel);
-
-        JPanel unitPanel = new JPanel(new GridLayout(1, 2));
-        JPanel units = new JPanel(new GridLayout(2, 1));
-
-        JPanel uCD = new JPanel();
-        JLabel uCDLabel = new JLabel("Unit of capacity and demand: ");
-        JTextField uCDField = new JTextField(5);
-        uCD.add(uCDLabel);
-        uCD.add(uCDField);
-        uCD.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-
-        JPanel uCo = new JPanel();
-        JLabel uCoLabel = new JLabel("Unit of cost: ");
-        JTextField uCoField = new JTextField(5);
-        uCo.add(uCoLabel);
-        uCo.add(uCoField);
-        uCo.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-
-        units.add(uCD);
-        units.add(uCo);
         
         JPanel next = new JPanel(new BorderLayout());
         JPanel nextButtonP = new JPanel();
@@ -175,10 +155,10 @@ public class ETSPanel extends JPanel {
                 nextButtonAction(e);
             }
         });
+        JPanel n = new JPanel();
 
-        unitPanel.add(units);
-        unitPanel.add(next);
-        tabPanel.add(unitPanel);
+        n.add(next);
+        tabPanel.add(n);
 
         JScrollPane pane = new JScrollPane();
         pane.setViewportView(tabPanel);
