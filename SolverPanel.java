@@ -1,3 +1,9 @@
+import org.rosuda.JRI.Rengine;
+import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RList;
+import org.rosuda.JRI.RVector;
+import org.rosuda.JRI.RMainLoopCallbacks;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -5,6 +11,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -48,6 +55,21 @@ public class SolverPanel extends JPanel {
         this.selection = MAXIMIZE;
         this.objFxn = "";
         this.constraints = "";
+        this.objFxnField = new JTextField();
+        this.conArea = new JTextArea();
+		this.setBackground(new Color(234, 240, 242));
+        this.requestFocusInWindow();
+        this.initComponents();
+    }
+
+    public SolverPanel(Container container, String objfxn, String cons){
+		super();
+        this.container = container;
+        this.selection = MAXIMIZE;
+        this.objFxn = objfxn;
+        this.constraints = cons;
+        this.objFxnField = new JTextField(this.objFxn);
+        this.conArea = new JTextArea(this.constraints);
 		this.setBackground(new Color(234, 240, 242));
         this.requestFocusInWindow();
         this.initComponents();
@@ -84,24 +106,16 @@ public class SolverPanel extends JPanel {
         JPanel objFxnLabelPanel = new JPanel();
         JLabel objFxnLabel = new JLabel("Objective Function");
         JPanel objFxnFieldPanel = new JPanel();
-        this.objFxnField = new JTextField();
+        
         objFxnFieldPanel.setOpaque(false);
         objFxnLabelPanel.setBackground(blu);
         objFxnPanel.setBackground(Color.WHITE);
         objFxnPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        JPanel plotPanel = new JPanel();
-        JPanel plotLabelPanel = new JPanel();
-        JLabel plotLabel = new JLabel("Plot");
-        plotLabelPanel.setBackground(blu);
-        plotPanel.setBackground(Color.WHITE);
-        plotPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
         JPanel leftPanel = new JPanel();
         JPanel conPanel = new JPanel();
         JPanel conLabelPanel = new JPanel();
         JLabel conLabel = new JLabel("Constraints");
-        this.conArea = new JTextArea();
 
         JPanel tabPanel = new JPanel();
         JPanel tabLabelPanel = new JPanel();
@@ -210,15 +224,16 @@ public class SolverPanel extends JPanel {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        Dimension dim = new Dimension(500, 190);
-
+        Dimension dim = new Dimension(765, 200);
+        conPanel.setPreferredSize(dim);
         tabPanel.setPreferredSize(dim);
+        objFxnPanel.setPreferredSize(new Dimension(765, 52));
+
         tabPanel.setLayout(new BorderLayout());
         tabPanel.add(tabLabelPanel, BorderLayout.NORTH);
         tabLabelPanel.add(tabLabel);
         tabPanel.add(this.tables, BorderLayout.CENTER);
 
-        plotPanel.setPreferredSize(dim);
         conPanel.setLayout(new BorderLayout());
         conPanel.add(conLabelPanel, BorderLayout.NORTH);
         conPanel.add(conArea, BorderLayout.CENTER);
@@ -226,28 +241,24 @@ public class SolverPanel extends JPanel {
 
         solvePanel.setPreferredSize(new Dimension(325, 50));
 
-        leftPanel.setPreferredSize(new Dimension(500, 445));
+        leftPanel.setPreferredSize(new Dimension(765, 445));
         GroupLayout leftPanelLayout = new GroupLayout(leftPanel);
         leftPanel.setLayout(leftPanelLayout);
         leftPanelLayout.setHorizontalGroup(
             leftPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(plotPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(tabPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(solvePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         leftPanelLayout.setVerticalGroup(
             leftPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, leftPanelLayout.createSequentialGroup()
-                .addComponent(plotPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(conPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(solvePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
-
-        plotPanel.setLayout(new BorderLayout());
-        plotPanel.add(plotLabelPanel, BorderLayout.NORTH);
-        plotLabelPanel.add(plotLabel);
 
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
@@ -262,8 +273,8 @@ public class SolverPanel extends JPanel {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(leftPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)))
+                        // .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -275,7 +286,7 @@ public class SolverPanel extends JPanel {
                 .addComponent(objFxnPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    // .addComponent(conPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(leftPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -341,5 +352,31 @@ public class SolverPanel extends JPanel {
         
         CardLayout cardLayout = (CardLayout) this.tables.getLayout();
         cardLayout.show(this.tables,"Tableau");
+
+        this.plot();
+    }
+
+    public void plot() {
+        if(this.objFxn.split("\\+").length != 2) {
+            JOptionPane.showMessageDialog(null, "No plot for this problem!");
+            return;
+        }
+        
+        String[] vars = this.objFxn.split("\\+");
+        String[] num = new String[vars.length];
+
+        for(int i = 0; i < vars.length; i++) {
+            String[] s = vars[i].split("\\*");
+            vars[i] = s[1];
+            num[i] = s[0];
+            System.out.println(num[i]);
+        }
+            
+        String n = this.objFxn.split("=")[1];
+        UltimateSolver.ENGINE.eval("f <- function(" + vars[0] + ", " + vars[1] + ") "+ n);
+        UltimateSolver.ENGINE.eval(vars[0] + " <- f(0,1)");
+        UltimateSolver.ENGINE.eval("par(new=TRUE");
+        UltimateSolver.ENGINE.eval(vars[1] + " <- f(1,0)");
+        UltimateSolver.ENGINE.eval("plot(c(" + vars[0] + ", " + vars[1] + "), type='l', col='blue', xlim=c(0," + num[0] + "), ylim=c(0," + num[1] + "))");
     }
 }

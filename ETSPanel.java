@@ -188,10 +188,45 @@ public class ETSPanel extends JPanel {
     public void nextButtonAction(ActionEvent e) {
         this.populate(this.capacity, this.src, this.capTable);
         this.populate(this.demand, this.dest, this.demTable);
-        // this.objFxn = this.objFxnField.getText();
-        // this.constraints = this.conArea.getText();
-        // UltimateSolver us = new UltimateSolver(this.selection, this.objFxn, this.constraints);
-        // ArrayList<Tableau> tabs = us.getTabList();
+        this.objFxn = this.getObjFxn();
+        System.out.println(this.objFxn);
+        this.getConstraints();
+        System.out.println(this.constraints);
+
+        SolverPanel s = new SolverPanel(container, this.objFxn, this.constraints);
+        container.add(s,"Solv");
+        CardLayout cardLayout = (CardLayout) container.getLayout();
+        cardLayout.show(container,"Solv");
+    }
+
+    public void getConstraints() {
+        this.getSpecificCons(this.src, this.dest, this.capacity, "<=", true);
+        this.getSpecificCons(this.dest, this.src, this.demand, "<=", false);
+    }
+
+    public void getSpecificCons(int size1, int size2, HashMap<String, Float> hashh,  String sep, boolean b) {
+        // System.out.println("1: " + size1 + "\n 2: " + size2);
+        String sub = "";
+        
+        String c = "";
+        for(int i = 0; i < size1; i++) {
+            int k = i + 1;
+            String index = String.valueOf(k);
+            for(int j = 0; j < size2; j++) {
+                int l = j + 1;
+
+                if(b) sub = k + "" + l;
+                else sub = l + "" + k;
+                
+                if(j == (size2 - 1))
+                    c = c + "1*x" + sub + sep + hashh.get(index);
+                else
+                    c = c + "1*x" + sub + "+";
+            }
+            // this.constraints.add(c);
+            c = c + "\n";
+        }
+        this.constraints = this.constraints + c;
     }
 
     public void populate(HashMap<String, Float> hashh, int size, JTable tab) {
@@ -199,6 +234,19 @@ public class ETSPanel extends JPanel {
             float fl = new Float((String) tab.getValueAt(1, (i + 1)));
             hashh.put(String.valueOf(i + 1), fl);
         }
+    }
+
+    public String getObjFxn() {
+        String fxn = "Z=";
+        for(int i = 1; i <= this.dest; i++) {
+            for(int j = 1; j <= this.src; j++) {
+                if(i == this.dest && j == this.src)
+                    fxn = fxn + ((String) this.coTable.getValueAt(i, j)) + "*x" + i + j;
+                else fxn = fxn + ((String) this.coTable.getValueAt(i, j)) + "*x" + i + j + "+";
+            }
+        }
+
+        return fxn;
     }
     
 }

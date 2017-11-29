@@ -121,23 +121,9 @@ public class Frame extends JFrame{
                 JTextField destField = new JTextField(5);
                 dest.add(destLabel);
                 dest.add(destField);
-
-                JPanel radioPanel = new JPanel();
-                JRadioButton min = new JRadioButton("Minimize");
-                JRadioButton max = new JRadioButton("Maximize");
-                max.setSelected(true);
-
-                ButtonGroup group = new ButtonGroup();
-                group.add(min);
-                group.add(max);
-
-                radioPanel.add(max);
-                radioPanel.add(min);
                 
                 all.add(src);
                 all.add(dest);
-                all.add(radioPanel);
-                all.setBackground(blu);
                 
                 JOptionPane pane = new JOptionPane(all);
 

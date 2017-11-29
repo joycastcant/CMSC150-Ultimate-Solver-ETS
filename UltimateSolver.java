@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UltimateSolver {
+    protected final static Rengine ENGINE = new Rengine(new String[] { "--no-save" }, false, null);
     private int selection;
     private String[] objFxn;
     private ArrayList<String> constraints;
@@ -138,8 +139,15 @@ public class UltimateSolver {
 
             for(int x = 0; x < rrow; x++) {
                 for(int y = 0; y < (ccol - 1); y++) {
-                    if(x == (rrow - 1))
-                        tablee[x][y] = "-" + tab[x][y];
+                    if(x == (rrow - 1)) {
+                        if(!tab[x][y].contains("-"))
+                            tablee[x][y] = "-" + tab[x][y];
+                        else {
+                            float b = new Float(tab[x][y]);
+                            b = b * -1;
+                            tablee[x][y] = String.valueOf(b);
+                        }
+                    }
                     else tablee[x][y] = tab[x][y];
                     System.out.print(tab[x][y] + "\t");
                 }
@@ -269,11 +277,11 @@ public class UltimateSolver {
         System.out.println(matrix);
         
         // Start Rengine.
-        Rengine engine = new Rengine(new String[] { "--no-save" }, false, null);
-        engine.eval("mat <- matrix(" + matrix + ", nrow=" + (rrow - 1) + ", ncol=" + (ccol - 1) + ")");
-        engine.eval("nmat <- t(mat)");
+        // Rengine engine = new Rengine(new String[] { "--no-save" }, false, null);
+        ENGINE.eval("mat <- matrix(" + matrix + ", nrow=" + (rrow - 1) + ", ncol=" + (ccol - 1) + ")");
+        ENGINE.eval("nmat <- t(mat)");
 
-        double[][] transposed = engine.eval("nmat").asDoubleMatrix();
+        double[][] transposed = ENGINE.eval("nmat").asDoubleMatrix();
         
         rrow = transposed.length + 1;
         ccol = transposed[0].length + 1;
@@ -438,7 +446,13 @@ public class UltimateSolver {
                 String[] arr = (v[i]).split("\\*");
                 if(arr[1].equals(tab[0][col])) {
                     if(flag == 0){
-                        tab[row][col] = objSign + arr[0];
+                        if(!arr[0].contains("-"))
+                            tab[row][col] = objSign + arr[0];
+                            else {
+                                float g = new Float(arr[0]);
+                                g = g * -1;
+                                tab[row][col] = String.valueOf(g);
+                            }
                         tab[row][n-1] = "1";
                     }
                     else
