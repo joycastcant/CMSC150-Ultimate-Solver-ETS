@@ -363,13 +363,10 @@ public class SolverPanel extends JPanel {
         }
         
         String[] vars = this.objFxn.split("\\+");
-        String[] num = new String[vars.length];
 
         for(int i = 0; i < vars.length; i++) {
             String[] s = vars[i].split("\\*");
             vars[i] = s[1];
-            num[i] = s[0];
-            System.out.println(num[i]);
         }
             
         String n = this.objFxn.split("=")[1];
@@ -377,6 +374,6 @@ public class SolverPanel extends JPanel {
         UltimateSolver.ENGINE.eval(vars[0] + " <- f(0,1)");
         UltimateSolver.ENGINE.eval("par(new=TRUE");
         UltimateSolver.ENGINE.eval(vars[1] + " <- f(1,0)");
-        UltimateSolver.ENGINE.eval("plot(c(" + vars[0] + ", " + vars[1] + "), type='l', col='blue', xlim=c(0," + num[0] + "), ylim=c(0," + num[1] + "))");
+        UltimateSolver.ENGINE.eval("plot(c(" + vars[0] + ", " + vars[1] + "), type='l', col='blue')");
     }
 }
