@@ -40,6 +40,7 @@ public class ETSPanel extends JPanel {
     private String constraints;
     private int src;
     private int dest;
+    private int selection;
     private HashMap<String, Float> capacity;
     private HashMap<String, Float> demand;
     private JTable capTable;
