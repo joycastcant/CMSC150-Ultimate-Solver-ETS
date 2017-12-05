@@ -15,6 +15,7 @@ public class Tableau {
 
         this.table = new String[this.nrow][this.ncol];
         
+        //fill the TR header
         for(int i = 0; i < this.nrow; i++) {
             for(int k = 0; k < this.ncol; k++) {
                 if(k == (this.ncol - 1)) {
@@ -29,7 +30,7 @@ public class Tableau {
         return this.basicSolution;
     }
 
-    public void setBasicSolution() {
+    public void setBasicSolution() {    //basic solution is shown as JLabel. it's a string
         String add = "";
         int flag = 0;
 
@@ -62,7 +63,7 @@ public class Tableau {
         int index = 0;
 
         int lastRow = this.nrow - 1;
-        for(int i = 0; i < (this.ncol - 2); i++) {
+        for(int i = 0; i < (this.ncol - 2); i++) {  //checks if the negative value is the "minimum"
             if(t[lastRow][i].contains("-") && new Float(t[lastRow][i]) < min) {
                 min = new Float(t[lastRow][i]);
                 index = i;
@@ -107,7 +108,7 @@ public class Tableau {
             if(i == this.nrow - 1)
                 t[i][tr] = " ";
             else if(b > 0 && a > 0) {
-                t[i][tr] = Float.toString(a/b);
+                t[i][tr] = Float.toString(a/b); //this is where the known "a/b" happens
             }
             else t[i][tr] = "X";
         }
@@ -123,7 +124,7 @@ public class Tableau {
         this.pe = new Float(t[x][pivotColumn]);
     }
 
-    public String checkColumn(int row) {
+    public String checkColumn(int row) {    //used to know the values for basic solution
         String[][] t = this.getTable();
         String var = "";
         int found = 0;

@@ -38,7 +38,6 @@ public class ETSPanel extends JPanel {
     protected Container container;
     private String objFxn;
     private String constraints;
-    private JPanel tables;
     private int src;
     private int dest;
     private int selection;
@@ -72,7 +71,7 @@ public class ETSPanel extends JPanel {
         this.selection = n;
     }
 
-    public void initComponents() {
+    public void initComponents() {  //UI for ETS
         Color blu = new Color(144, 223, 244);
         // JPanel everyThing = new JPanel(new BorderLayout());
         
@@ -169,23 +168,22 @@ public class ETSPanel extends JPanel {
         this.populate(this.capacity, this.src, this.capTable);
         this.populate(this.demand, this.dest, this.demTable);
         this.objFxn = this.getObjFxn();
-        System.out.println(this.objFxn);
         this.getConstraints();
-        System.out.println(this.constraints);
 
+        //use the basic optimizer, parameters are extracted from user input
         SolverPanel s = new SolverPanel(container, this.objFxn, this.constraints);
         container.add(s,"Solv");
         CardLayout cardLayout = (CardLayout) container.getLayout();
         cardLayout.show(container,"Solv");
     }
 
-    public void getConstraints() {
+    public void getConstraints() {  //create constraints like how the basic optimizer accepts them
         this.getSpecificCons(this.src, this.dest, this.capacity, "<=", true);
         this.getSpecificCons(this.dest, this.src, this.demand, "<=", false);
     }
 
+      //create constraints like how the basic optimizer accepts them
     public void getSpecificCons(int size1, int size2, HashMap<String, Float> hashh,  String sep, boolean b) {
-        // System.out.println("1: " + size1 + "\n 2: " + size2);
         String sub = "";
         
         String c = "";
@@ -216,6 +214,7 @@ public class ETSPanel extends JPanel {
         }
     }
 
+    //create objective function using the user input (like how the basic optimizer accepts them)
     public String getObjFxn() {
         String fxn = "Z=";
         for(int i = 1; i <= this.dest; i++) {

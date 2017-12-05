@@ -18,23 +18,21 @@ public class UltimateSolver {
     public UltimateSolver(int selection, String fxn, String con) {
         this.tabList = new ArrayList<Tableau>();
         this.selection = selection;
-        String f = fxn.split("=")[1];
+        String f = fxn.split("=")[1];   //objective function parsing
         this.objFxn = f.split("\\+");
         this.constraints = new ArrayList<String>();
 
         String[] conArray = con.split("\n");
-        for(int i = 0; i < conArray.length; i++) {
+        for(int i = 0; i < conArray.length; i++) {  //constraints parsing
             if(!conArray[i].contains("<=") && !conArray[i].contains(">=") && conArray[i].contains("=")) {
                 String rep = conArray[i].replace('=', 'S');
-                System.out.println(rep);
                 constraints.add(rep);
             }
 
-            System.out.println("eep"+conArray[i]);
             constraints.add(conArray[i]);
         }
         
-        solve(this.objFxn.length, constraints.size(), f);
+        solve(this.objFxn.length, constraints.size(), f);   //actual solving
     }
 
     public ArrayList<Tableau> getTabList() {
@@ -47,14 +45,14 @@ public class UltimateSolver {
         String[] variables = new String[vars];
         String[][] table = new String[nrow + 2][ncol + 1];
 
-        // if(this.selection == 0) objSign = "-";
-
-        if(this.selection == SolverPanel.MAXIMIZE) {
+        if(this.selection == SolverPanel.MAXIMIZE) {    //if maximize was chosen
+            //objective function parsing
             for(int k = 0; k < vars; k++) {
                 String[] pair = (this.objFxn[k]).split("\\*");
                 variables[k] = pair[1];
             }
     
+            //table preparation
             for(int j = 0; j < (ncol + 1); j++) {
                 if (j == 0) {
                     table[0][j] ="Var";
@@ -79,53 +77,42 @@ public class UltimateSolver {
                     this.addConstraint(table, i, this.constraints.get(i - 1), ncol);
                 }
             }
-
-            for(int x = 0; x < (nrow + 2); x++) {
-                for(int y = 0; y < ncol; y++) {
-                    System.out.print(table[x][y] + "\t");
-                }
-                System.out.println(" \n");
-            }
-        } else {
+        } else {    //minimize is chosen
             objSign = "-";
             ncol = vars + 2;
-            nrow = this.constraints.size() + 2;//nrow + 2; //plus 2 bc may Z at label
+            nrow = this.constraints.size() + 2;
             table = new String[nrow][ncol];
-            System.out.println("row "+nrow+", col "+ncol);
 
+            //objective function parsing
             for(int k = 0; k < vars; k++) {
                 String[] pair = (this.objFxn[k]).split("\\*");
                 variables[k] = pair[1];
             }
-            // System.out.println(variables.length);
+            
+            //table preparations
             for(int j = 0; j < (ncol + 1); j++) {
                 if (j == 0) {
                     table[0][j] ="Var";
-                    System.out.println("var table[0]["+j+"] = " + table[0][j]);
                 } else {
                     if (j <= vars){
                         table[0][j] = variables[j - 1]; //actual vars
-                        System.out.println("vars table[0]["+j+"] = " + table[0][j]);
                     }
                     else if(j == (ncol - 1)){
                         table[0][j] ="Sol'n";
-                        System.out.println("sol table[0]["+j+"] = " + table[0][j]);
                     }
                 }
             }
             
             for(int i = 1; i < nrow; i++) {
-                System.out.println("AAAAAAAAAA " + i);
                 if(i == (nrow - 1)) {
                     table[i][0] = "Z";
                     this.addVariables(table, i, f, ncol);
-                    System.out.println("Zcurr row: "+i);
                 } else {
                     this.addVariables(table, i, this.constraints.get(i - 1), ncol);
-                    System.out.println("curr row: "+i);
                 }
             }
 
+            //transpose table
             String[][] tab = transpose(table);
     
             int rrow = tab.length;
@@ -137,6 +124,7 @@ public class UltimateSolver {
 
             String[][] tablee = new String[rrow][ccol + vars];
 
+            //solve like maximization
             for(int x = 0; x < rrow; x++) {
                 for(int y = 0; y < (ccol - 1); y++) {
                     if(x == (rrow - 1)) {
@@ -149,9 +137,7 @@ public class UltimateSolver {
                         }
                     }
                     else tablee[x][y] = tab[x][y];
-                    System.out.print(tab[x][y] + "\t");
                 }
-                System.out.println(" \n");
             }
 
             for(int i = 1; i < rrow; i++) {//<= rrow; i++) {
@@ -161,16 +147,8 @@ public class UltimateSolver {
                     tablee[i][0] = "S" + i;
             }
 
-            for(int x = 0; x < rrow; x++) {
-                for(int y = 0; y < ccol; y++) {
-                    // tablee[x][y] = tab[x][y];
-                    System.out.print(tab[x][y] + "\t");
-                }
-                System.out.println(" \n");
-            }
-
             int cons = this.constraints.size();
-            System.out.println("cons: "+cons);
+            
             for(int i = 1; i < rrow; i++) {
                 for(int j = (i + cons); j <= (ccol + cons); j++) {
                     tablee[0][j] = "S" + (j - cons);
@@ -189,20 +167,13 @@ public class UltimateSolver {
                 }
             }
 
-            for(int x = 0; x < rrow; x++) {
-                for(int y = 0; y < (ccol + vars); y++) {
-                    System.out.print(tablee[x][y] + "\t");
-                }
-                System.out.println(" \n");
-            }
-
             table = tablee;
         }
 
         this.tabList.add(new Tableau(table));
         this.tabList.add(new Tableau(table));
         
-        while(!isDone(this.tabList.get(this.tabList.size() - 1))) {
+        while(!isDone(this.tabList.get(this.tabList.size() - 1))) { //do gauss jordan while not done
             int curr = this.tabList.size() - 1;
 
             Tableau currTab = this.tabList.get(curr);
@@ -216,7 +187,7 @@ public class UltimateSolver {
             this.tabList.add(gaussJordan(currTab, pEX, pEY, pe));
         }
 
-        //adjust TR
+        //adjust test ratio (move one iteration up)
         for(int p = 0; p < (this.tabList.size() - 1); p++) {
             Tableau currT = this.tabList.get(p);
             String[][] tb = currT.getTable();
@@ -237,22 +208,11 @@ public class UltimateSolver {
             if (p > 0)
                 currT.setBasicSolution();
         }
-
-        /* for(int q = 0; q < (this.tabList.size() - 1); q++) {
-            System.out.println("Iteration " + q);
-            Tableau cur = this.tabList.get(q);
-            for(int x = 0; x < cur.getRow(); x++) {
-                for(int y = 0; y < cur.getCol(); y++) {
-                    System.out.print(cur.getTable()[x][y] + "\t");
-                }
-                System.out.println(" ");
-            }
-        } */
         
         printValue();
     }
 
-    private String[][] transpose(String[][] tab) {
+    private String[][] transpose(String[][] tab) {  //use R's transpose
         String matrix = "c(";
         
         int rrow = tab.length;
@@ -276,10 +236,6 @@ public class UltimateSolver {
             }
         }
 
-        System.out.println(matrix);
-        
-        // Start Rengine.
-        // Rengine engine = new Rengine(new String[] { "--no-save" }, false, null);
         ENGINE.eval("mat <- matrix(" + matrix + ", nrow=" + (rrow - 1) + ", ncol=" + (ccol - 1) + ")");
         ENGINE.eval("nmat <- t(mat)");
 
@@ -305,7 +261,7 @@ public class UltimateSolver {
         return fin;
     }
 
-    private void printValue() {
+    private void printValue() { //add values to the final table for answers
         Tableau tab = this.tabList.get(this.tabList.size() - 1);
         String[][] t = tab.getTable();
         int j = tab.getCol() - 1;
@@ -315,16 +271,9 @@ public class UltimateSolver {
                 t[i][j] = "Val";
             else t[i][j] = tab.checkColumn(i);
         }
-
-        /* System.out.println("Final Answers: ");
-        for(int x = 0; x < tab.getRow(); x++) {
-            for(int y = 0; y < tab.getCol(); y++) {
-                System.out.print(t[x][y] + "\t");
-            }
-            System.out.println(" ");
-        } */
     }
 
+    //only one iteration in gauss jordan
     private Tableau gaussJordan(Tableau tab, int pEX, int pEY, float pe) {
         String[][] t = tab.getTable();
         int nrow = tab.getRow();
@@ -361,7 +310,6 @@ public class UltimateSolver {
     private boolean isDone(Tableau tab) {
         if(this.tabList.size() >= 50) return true;
 
-        System.out.println("ITERATION " + this.tabList.size());
         String[][] table = tab.getTable();
         
         int lastRow = table.length - 1;
@@ -373,22 +321,18 @@ public class UltimateSolver {
         return true;
     }
 
+    //parse constraints to add correct values to the table
     private void addVariables(String[][] tab, int row, String eq, int n) {
-        System.out.println("n: " + n + "\n" +"row: " + row + "\n" +"eq: " + eq + "\n");
         String sol = "0";
         int flag = 0;
         String splitter = "";
-        // String sign = "";
-        // String objSign = "";
 
         if(eq.contains("<="))
             splitter ="<=";
         else if(eq.contains(">=")) {
             splitter = ">=";
-            // sign = "-";
         } else if(eq.contains("S")) {
             splitter = "S";
-            // sign = "-";
         } else splitter = "=";
 
         String[] wsol = eq.split(splitter);
@@ -416,6 +360,7 @@ public class UltimateSolver {
         }
     }
 
+    //add constraints to the table
     private void addConstraint(String[][] tab, int row, String eq, int n) {
         String sol = "0";
         int flag = 0;
@@ -442,7 +387,6 @@ public class UltimateSolver {
         }
 
         String[] v = (wsol[0]).split("\\+");
-        // System.out.println(n);
         for(int col = 1; col <= n; col++) {
             for(int i = 0; i < v.length; i++) {
                 String[] arr = (v[i]).split("\\*");
