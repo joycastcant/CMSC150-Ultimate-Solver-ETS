@@ -49,7 +49,7 @@ public class SolverPanel extends JPanel {
     private String constraints;
     private JPanel tables;
 
-	public SolverPanel(Container container){
+	public SolverPanel(Container container){    //constructor for optimizer
 		super();
         this.container = container;
         this.selection = MAXIMIZE;
@@ -62,7 +62,7 @@ public class SolverPanel extends JPanel {
         this.initComponents();
     }
 
-    public SolverPanel(Container container, String objfxn, String cons){
+    public SolverPanel(Container container, String objfxn, String cons){    //constructor for ETS
 		super();
         this.container = container;
         this.selection = MAXIMIZE;
@@ -75,7 +75,7 @@ public class SolverPanel extends JPanel {
         this.initComponents();
     }
 
-    private void initComponents() {
+    private void initComponents() { //addition of UI and functionalities to the panel
         Color blu = new Color(144, 223, 244);
 
         JPanel radioPanel = new JPanel();
@@ -306,18 +306,16 @@ public class SolverPanel extends JPanel {
         UltimateSolver us = new UltimateSolver(this.selection, this.objFxn, this.constraints);
         ArrayList<Tableau> tabs = us.getTabList();
         
-        // this.tabPanel.setLayout(new GridLayout((tabs.size() - 1), 1));
         JPanel tableauPanel = new JPanel(new GridLayout(tabs.size(), 1));
-        // BoxLayout box = new BoxLayout(tableauPanel, BoxLayout.Y_AXIS);
         JScrollPane tabPane = new JScrollPane();
         tabPane.setViewportView(tableauPanel);
         this.tables.add(tabPane, "Tableau");
         
+        //UI for tableau
         for(int i = 0; i < tabs.size(); i++) {
             Tableau curr = tabs.get(i);
             String[][] t = curr.getTable();
             DefaultTableModel model = new DefaultTableModel(curr.getRow(), curr.getCol());
-            // DefaultTableModel model = new DefaultTableModel(curr.getTable(), null);
             for(int j = 0; j < curr.getRow(); j++) {
                 for(int k = 0; k < curr.getCol(); k++) {
                     model.setValueAt(t[j][k], j, k);
@@ -356,7 +354,7 @@ public class SolverPanel extends JPanel {
         this.plot();
     }
 
-    public void plot() {
+    public void plot() {    //plotting of the objective function (using R)
         if(this.objFxn.split("\\+").length != 2) {
             JOptionPane.showMessageDialog(null, "No plot for this problem!");
             return;

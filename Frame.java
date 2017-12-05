@@ -32,7 +32,7 @@ import javax.swing.WindowConstants;
 
 public class Frame extends JFrame{
 
-    public Frame(){
+    public Frame(){ //this frame will contain both basic optimizer and ETS
         super("Ultimate Solver");
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(800, 600));
